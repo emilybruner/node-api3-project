@@ -110,9 +110,17 @@ router.put('/:id', (req, res) => {
 
 //custom middleware
 
-// function validateUserId(req, res, next) {
-//   if(req.params.id === user_id)
-// }
+function validateUserId(req, res, next) {
+  const id = req.params.id;
+  User.getById(id)
+  .then(userById => {
+    if (userById) {
+      next();
+    } else {
+      res.status(404).json(error: "The user with the specified ID does not exist")
+    }
+  })
+}
 
 function validateUser(req, res, next) {
   // do your magic!
