@@ -124,6 +124,7 @@ function validateUserId(req, res, next) {
 }
 
 function validateUser(req, res, next) {
+  const {name} = req.body
   if (!name) {
     return res.status(400).json({errorMessage: "Name required"});
   } else {
@@ -133,7 +134,17 @@ function validateUser(req, res, next) {
 }
 
 function validatePost(req, res, next) {
-  // do your magic!
+  const {id: user_id} = req.params;
+  const {text} = req.body;
+
+  if (!req.body) {
+    return res.status(400).json({message: "Missing post data"})
+  }
+  if (!text) {
+    return res.status(400).json({message: "missing required text field"})
+  }
+
+  next();
 }
 
 module.exports = router;
