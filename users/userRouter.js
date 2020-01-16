@@ -80,22 +80,39 @@ router.get('/:id/posts', (req, res) => {
 router.delete('/:id', (req, res) => {
   User.remove(req.params.id)
   .then(removed => {
-    removed > 0 ? res.status(200).json({message: "Post deleted successfully"}) : res.status(404).json({message: "A post with that ID does not exist"})
+    removed ? res.status(200).json({message: "User deleted successfully"}) : res.status(404).json({message: "A user with that ID does not exist"})
   })
   .catch(error => {
-    res.status(500).json({ errorMessage: "The post could not be removed"})
+    res.status(500).json({ errorMessage: "The user could not be removed"})
   })
 });
 
+// 
+
+
 router.put('/:id', (req, res) => {
-  // do your magic!
+  const changes = req.body;
+  const id = req.params.id;
+  const {user} = id;
+
+  user ? res.status(400).json({errorMessage: "Please provide name for user"}):
+
+  User.update(id, changes)
+  .then(update => {
+    update === 0 ? res.status(404).json({message: "The user with the specified ID does not exist"}) :
+    res.status(200).json(user)
+  })
+  .catch(error => {
+    res.status(500).json({error: "There was an error editing the user information"})
+  })
+
 });
 
 //custom middleware
 
-function validateUserId(req, res, next) {
-  // do your magic!
-}
+// function validateUserId(req, res, next) {
+//   if(req.params.id === user_id)
+// }
 
 function validateUser(req, res, next) {
   // do your magic!

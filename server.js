@@ -12,14 +12,20 @@ const server = express();
 
 // middleware
 server.use(express.json());
+server.use(logger);
 
 server.use('/api/user', userRouter);
 
 
 
 
+
 //custom middleware
 
-function logger(req, res, next) {}
+function logger(req, res, next) {
+  const {method, originalUrl} = req;
+  console.log(`Method : ${req.method} to ${req.originalUrl} at ${Date.now()}`);
+  next();
+}
 
 module.exports = server;
