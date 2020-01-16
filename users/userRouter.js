@@ -27,7 +27,7 @@ router.post('/', validateUser, (req, res) => {
 
 // POST to create a new post
 
-router.post('/:id/posts', (req, res) => {
+router.post('/:id/posts', validateUserId, validatePost, (req, res) => {
  Posts.insert({user_id: req.params.id, text: req.body.text})
  .then(post => {
    res.status(200).json({message: post})
