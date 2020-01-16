@@ -6,7 +6,7 @@ const router = express.Router();
 
 // POST to create a new user
 
-router.post('/', (req, res) => {
+router.post('/', validateUser, (req, res) => {
   const name = req.body;
   console.log(name)
   User.insert(name)
@@ -51,21 +51,21 @@ router.get('/', (req, res) => {
 
 // GET a user by Id
 
-router.get('/:id', (req, res) => {
-  const id = req.params.id;
-  User.getById(id)
-  .then(userById => {
-    userById ? res.status(200).json(userById) : res.status(404).json({ message: "The user with the specified ID does not exist"})
-  })
-  .catch(error => {
-    res.status(500).json({ errorMessage: "The users information could not be recieved"})
-  })
+router.get('/:id', validateUserId, (req, res) => {
+  // const id = req.params.id;
+  res.status(200).json(req.user)
+  // User.getById(id)
+  // .then(userById => {
+  //   userById ? res.status(200).json(userById) : res.status(404).json({ message: "The user with the specified ID does not exist"})
+  // })
+  // .catch(error => {
+  //   res.status(500).json({ errorMessage: "The users information could not be recieved"})
+  // })
 });
 
 // GET a post by Id
 
-router.get('/:id/posts', (req, res) => {
-  const id = req.params.id;
+router.get('/:id/posts', validateUserId, (req, res) => {
   User.getUserPosts(req.params.id)
   .then(posts => {
     !posts ? res.status(500).json({errorMessage: "The post with that ID does not exist"}) : res.status(200).json(posts)
@@ -77,10 +77,11 @@ router.get('/:id/posts', (req, res) => {
 
 // Delete user
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', validateUserId, (req, res) => {
   User.remove(req.params.id)
-  .then(removed => {
-    removed ? res.status(200).json({message: "User deleted successfully"}) : res.status(404).json({message: "A user with that ID does not exist"})
+  .then(()=> {
+    // removed ? res.status(200).json({message: "User deleted successfully"}) : res.status(404).json({message: "A user with that ID does not exist"})
+    res.status(204).json({message: "The user was removed successfully"})
   })
   .catch(error => {
     res.status(500).json({ errorMessage: "The user could not be removed"})
@@ -90,17 +91,16 @@ router.delete('/:id', (req, res) => {
 // 
 
 
-router.put('/:id', (req, res) => {
+router.put('/:id', validateUserId, (req, res) => {
   const changes = req.body;
   const id = req.params.id;
   const {user} = id;
 
-  user ? res.status(400).json({errorMessage: "Please provide name for user"}):
+  // user ? res.status(400).json({errorMessage: "Please provide name for user"}):
 
   User.update(id, changes)
   .then(update => {
-    update === 0 ? res.status(404).json({message: "The user with the specified ID does not exist"}) :
-    res.status(200).json(user)
+    res.status(200).json(update)
   })
   .catch(error => {
     res.status(500).json({error: "There was an error editing the user information"})
@@ -115,15 +115,21 @@ function validateUserId(req, res, next) {
   User.getById(id)
   .then(userById => {
     if (userById) {
+      req.user = userById;
       next();
     } else {
-      res.status(404).json(error: "The user with the specified ID does not exist")
+      res.status(404).json({error: "The user with the specified ID does not exist"})
     }
   })
 }
 
 function validateUser(req, res, next) {
-  // do your magic!
+  if (!name) {
+    return res.status(400).json({errorMessage: "Name required"});
+  } else {
+    next();
+  }
+  
 }
 
 function validatePost(req, res, next) {
