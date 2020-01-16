@@ -10,11 +10,12 @@ const server = express();
 //   res.send(`<h2>Let's write some middleware!</h2>`);
 // });
 
+// middleware
+server.use(express.json());
+
 server.use('/api/user', userRouter);
 
 
-// middleware
-server.use(express.json());
 
 
 //custom middleware
